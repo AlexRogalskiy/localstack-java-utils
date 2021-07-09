@@ -19,6 +19,8 @@ import software.amazon.kinesis.metrics.NullMetricsFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import software.amazon.kinesis.retrieval.RetrievalConfig;
+import software.amazon.kinesis.retrieval.polling.PollingConfig;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -32,7 +34,7 @@ public class KinesisSchedulerTest extends PowerMockLocalStack {
 
   @Before
   public void mockServicesForScheduler() {
-    // System.setProperty(SdkSystemSetting.CBOR_ENABLED.property(), "false");
+    System.setProperty(SdkSystemSetting.CBOR_ENABLED.property(), "false");
     PowerMockLocalStack.mockCloudWatchAsyncClient();
     PowerMockLocalStack.mockDynamoDBAsync();
     PowerMockLocalStack.mockKinesisAsync();
@@ -52,7 +54,14 @@ public class KinesisSchedulerTest extends PowerMockLocalStack {
     DeliveryStatusRecordProcessorFactory processorFactory = new DeliveryStatusRecordProcessorFactory(eventProcessor);
 
     ConfigsBuilder configsBuilder = new ConfigsBuilder(streamName, streamName, kinesisAsyncClient, dynamoAsyncClient,
-        cloudWatchAsyncClient, workerId, processorFactory);
+        cloudWatchAsyncClient, workerId, processorFactory) {
+      @Override
+      public RetrievalConfig retrievalConfig() {
+        RetrievalConfig retrievalConfig = super.retrievalConfig();
+        retrievalConfig.retrievalSpecificConfig(new PollingConfig(streamName(), kinesisClient()));
+        return retrievalConfig;
+      }
+    };
     Scheduler scheduler = createScheduler(configsBuilder);
 
     new Thread(scheduler).start();

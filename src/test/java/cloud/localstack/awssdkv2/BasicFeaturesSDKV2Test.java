@@ -153,7 +153,7 @@ public class BasicFeaturesSDKV2Test {
         // Test integration of ssm parameter with LocalStack using SDK v2
 
         final SsmAsyncClient clientSsm = TestUtils.getClientSSMAsyncV2();
-        clientSsm.putParameter(PutParameterRequest.builder().name("testparameter").value("testvalue").build());
+        clientSsm.putParameter(PutParameterRequest.builder().name("testparameter").value("testvalue").build()).get();
         CompletableFuture<GetParameterResponse> getParameterResponse = clientSsm.getParameter(GetParameterRequest.builder().name("testparameter").build());
         String parameterValue = getParameterResponse.get().parameter().value();
         Assert.assertNotNull(parameterValue);
@@ -272,7 +272,7 @@ public class BasicFeaturesSDKV2Test {
 
 		String username =  UUID.randomUUID().toString();
 		CreateUserRequest createUserRequest = CreateUserRequest.builder().userName(username).build();
-		iamClient.createUser(createUserRequest);
+		iamClient.createUser(createUserRequest).get();
 		
         boolean userFound = false;
         List<User> users = iamClient.listUsers().get().users();
@@ -295,7 +295,7 @@ public class BasicFeaturesSDKV2Test {
 
 		String username = UUID.randomUUID().toString();
 		CreateUserRequest createUserRequest = CreateUserRequest.builder().userName(username).build();
-		iamClient.createUser(createUserRequest);
+		iamClient.createUser(createUserRequest).get();
 		
 
        AtomicBoolean userFound = new AtomicBoolean(false);
