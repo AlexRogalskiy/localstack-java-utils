@@ -11,11 +11,11 @@ publish-maven:   ## Publish artifacts to Maven Central
 
 test-v1:
 	USE_SSL=1 SERVICES=serverless,kinesis,sns,sqs,iam,cloudwatch mvn -Pawssdkv1 \
-                -Dtest="!cloud.localstack.awssdkv2.*Test" test
+                -Dtest="!cloud.localstack.awssdkv2.*Test" -Dmaven.test.failure.ignore=true test
 
 test-v2:
 	USE_SSL=1 SERVICES=serverless,kinesis,sns,sqs,iam,cloudwatch mvn -Pawssdkv2 \
-		-Dtest="cloud.localstack.awssdkv2.*Test" test
+		-Dtest="cloud.localstack.awssdkv2.*Test" -Dmaven.test.failure.ignore=true test
 
 test:            ## Run Java/JUnit tests for AWS SDK v1 and v2
 	make test-v2
